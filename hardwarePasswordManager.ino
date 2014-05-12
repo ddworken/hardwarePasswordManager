@@ -1,10 +1,12 @@
 
 #include <EEPROM.h>
-int led = 13;
+int led = 13; //on arduino micro there is a led attached to pin 13
 int method = 1;//0 is best (keylogger proof); 1 uses delete to trash gibberish data; 2 uses new tabs for temp storage of gibberish; 3 has no keylogger security;-1=nothing
-String password = "correcthorsebatterystaple";
-int EEPROMAddr = 1;
-int EEPROMAddrButton = 499; 
+String password = "correcthorsebatterystaple"; //default password (see http://xkcd.com/936)
+int EEPROMAddrButton = 499; //EEPROM address for storing number of times reset before running
+boolean requireSerialUnlock = true; //set to true to require the user to type in pinCode into serial before it outputs data. false means no authentication. 
+String pinCode = "1234"; //unlock code. 
+
 /*
 -Setup Function
 -Initializes serial, keyboard, and mouse control and sets the seed for the random number generator to analogRead(0)
@@ -29,12 +31,14 @@ void setup() {
 -Then continually prompts the user to enter a new password using programNewPassword();
 */
 void loop() {
-  if(PINEntered()){}
-    delay(1000);
+  delay(250);
+  if(PINEntered()){
+    Serial.println("Password accepted. Please click in input box within 2 seconds. ");
+    delay(2000);
     int passwordButtonPresses = getPasswordButtonPresses();
     Serial.println(passwordButtonPresses);
     password = retrievePasswordFromEEPROM(passwordButtonPresses*100);
-    EEPROM.write(EEPROMAddr, (int)0);
+    EEPROM.write(EEPROMAddrButton, (int)0);
     if(method!=-1){
       for(int i = 0; i < password.length(); i++){
         typeCharAt(i); 
@@ -172,5 +176,22 @@ int getPasswordButtonPresses(){
 -If the pin has been entered, return true. Otherwise return false. 
 */
 boolean PINEntered(){
-  return true; //Currently always returns true until hardware support for this is added. 
+  if(requireSerialUnlock){ //forces user to enter password stored in first index. 
+    Serial.println(F("Please input your password to unlock this device."));
+    String result = "";
+    if(Serial.available()){
+      while(Serial.available() > 0){
+        result += (char)Serial.read();
+        delay(5);
+      } 
+      if(result.equals(pinCode)){
+        return true;
+      }
+      return false;
+    }
+  }
+  else{
+    return true; 
+  }
+  return false;
 }
