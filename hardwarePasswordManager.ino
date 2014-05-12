@@ -29,22 +29,24 @@ void setup() {
 -Then continually prompts the user to enter a new password using programNewPassword();
 */
 void loop() {
-  delay(1000);
-  int passwordButtonPresses = getPasswordButtonPresses();
-  Serial.println(passwordButtonPresses);
-  password = retrievePasswordFromEEPROM(passwordButtonPresses*100);
-  EEPROM.write(EEPROMAddr, (int)0);
-  if(method!=-1){
-    for(int i = 0; i < password.length(); i++){
-      typeCharAt(i); 
-      trashData(method);
+  if(PINEntered()){}
+    delay(1000);
+    int passwordButtonPresses = getPasswordButtonPresses();
+    Serial.println(passwordButtonPresses);
+    password = retrievePasswordFromEEPROM(passwordButtonPresses*100);
+    EEPROM.write(EEPROMAddr, (int)0);
+    if(method!=-1){
+      for(int i = 0; i < password.length(); i++){
+        typeCharAt(i); 
+        trashData(method);
+      }
     }
-  }
-  Keyboard.end();
-  Mouse.end();
-  while(true){
-    delay(500);
-    programNewPassword();
+    Keyboard.end();
+    Mouse.end();
+    while(true){
+      delay(500);
+      programNewPassword();
+    }
   }
 }
 
@@ -164,4 +166,11 @@ String retrievePasswordFromEEPROM(int addr){
 */
 int getPasswordButtonPresses(){
   return EEPROM.read(EEPROMAddrButton) - 1;
+}
+
+/*
+-If the pin has been entered, return true. Otherwise return false. 
+*/
+boolean PINEntered(){
+  return true; //Currently always returns true until hardware support for this is added. 
 }
