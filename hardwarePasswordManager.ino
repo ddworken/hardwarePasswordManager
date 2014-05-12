@@ -29,7 +29,7 @@ void setup() {
 -Then continually prompts the user to enter a new password using programNewPassword();
 */
 void loop() {
-  delay(10000);
+  delay(1000);
   int passwordButtonPresses = getPasswordButtonPresses();
   Serial.println(passwordButtonPresses);
   password = retrievePasswordFromEEPROM(passwordButtonPresses*100);
@@ -57,7 +57,7 @@ void typeCharAt(int i){
 }
 
 /*
--
+-Generates trash data for keylogger-proofing the program. 
 */
 void trashData(int type){
   if(type == 0){ //moves mouse to left, types gibberish into nothing, then goes back to field for next char then repeates
@@ -105,7 +105,10 @@ void trashData(int type){
     //do nothing
   }
 }
-
+/*
+-When called it checks if serial is available. If serial is available it parses the serial input to retrieve a password (String) and EEPROM index (int). 
+-It sends the string and EEPROM index to the stringToEEPROM method. 
+*/
 void programNewPassword(){
   int i = 0;
   String whichPassword = "";
@@ -125,10 +128,15 @@ void programNewPassword(){
     password=result;
   }
   else{
-    Serial.println(F("Type in password (Must be less than 100 characters).")); 
+    Serial.println(F("Type in storage space followed by password (Must be less than 100 characters). E.g. \"2correcthorsebatterystaple\"")); 
   }
 }
 
+/*
+-Receives a string and a address to store that string in. 
+-Stores the string in the EEPROM by first setting the byte at the address specified to the length of the string. 
+-Then stores the rest of the string in each additional place (one character to one byte).
+*/
 void stringToEEPROM(String toE, int addr){
   EEPROM.write(addr, toE.length());
   for(int i = 0; i < toE.length(); i ++){
@@ -137,16 +145,23 @@ void stringToEEPROM(String toE, int addr){
   }
 }
 
+/*
+-Returns a string that is the password retrieved from the EEPROM at the address that is passed to the method. 
+-Works by reading byte at EEPROM address to determine length of password and then iterating through the EEPROM that many bytes. 
+*/
 String retrievePasswordFromEEPROM(int addr){
   String result = "";
   for(int i = 0; i < EEPROM.read(addr); i++){
     result+=(char)EEPROM.read(i+addr+1);
     delay(5);
   }
-  Serial.println(result);
   return result;
 }
 
+/*
+-Returns the number of times the button dedicated to choosing which password is pressed. 
+-Currently works by reading a value from the EEPROM. Each time the Arduino turns on it increments that value. After outputting the password it sets that value to 0. By reseting the arduino before it outputs the password one can change which password the arduino will output. 
+*/
 int getPasswordButtonPresses(){
   return EEPROM.read(EEPROMAddrButton) - 1;
 }
