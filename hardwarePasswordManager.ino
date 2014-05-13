@@ -1,4 +1,3 @@
-
 #include <EEPROM.h>
 int led = 13; //on arduino micro there is a led attached to pin 13
 int method = 1;//0 is best (keylogger proof); 1 uses delete to trash gibberish data; 2 uses new tabs for temp storage of gibberish; 3 has no keylogger security;-1=nothing
@@ -32,6 +31,7 @@ void setup() {
 */
 void loop() {
   delay(250);
+  pinCode = retrievePasswordFromEEPROM(1000);
   if(PINEntered()){
     Serial.println("Password accepted. Please click in input box within 2 seconds. ");
     delay(2000);
@@ -122,19 +122,39 @@ void programNewPassword(){
   if(Serial.available()){
     result = "";
     int i;
-    i = Serial.read() - 48;
-    while(Serial.available() > 0){
-      result += (char)Serial.read();
-      delay(5);
-    } 
-    Serial.print(F("Password set to: "));
-    Serial.println(result);
-    Serial.println(i);
-    stringToEEPROM(result, i*100);
-    password=result;
+    i = Serial.read();
+    if(i < 57){
+      i = i - 48;
+      while(Serial.available() > 0){
+        result += (char)Serial.read();
+        delay(5);
+      } 
+      Serial.print(F("Password set to: "));
+      Serial.println(result);
+      Serial.println(i);
+      stringToEEPROM(result, i*100);
+      password=result;
+    }
+    else{
+      if(i == (int)'k' || i == (int)'k'){ //k for setting keylogger use
+        //not implemented yet
+      }
+      else{
+        if(i == (int)'p' || i == (int)'P'){ //p for setting pin
+          while(Serial.available() > 0){
+            result += (char)Serial.read();
+            delay(5);
+          }
+          Serial.print("Set pin to: ");
+          Serial.println(result);
+          stringToEEPROM(result, 1000);
+        } 
+      }
+    }
   }
   else{
-    Serial.println(F("Type in storage space followed by password (Must be less than 100 characters). E.g. \"2correcthorsebatterystaple\"")); 
+    Serial.println(F("Type in storage space followed by password (Must be less than 100 characters). E.g. \"2correcthorsebatterystaple\"."));
+    Serial.println(F("Enter p followed by a password to change the password required to access this device. E.g. \"p1234\"")); 
   }
 }
 
