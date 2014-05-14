@@ -33,7 +33,7 @@ void loop() {
   delay(250);
   pinCode = _getString(90);                                                                               //*****************************************************
   if(PINEntered()){
-    Serial.println("Password accepted. Please click in input box within 2 seconds. ");
+    Serial.println(F("Password accepted. Please click in input box within 2 seconds. "));
     delay(2000);
     int passwordButtonPresses = getPasswordButtonPresses();
     Serial.println(passwordButtonPresses);
@@ -71,7 +71,7 @@ void trashData(int type){
     Mouse.click();
     int randomN = (int)random(0,5);
     for(int i = 0; i < randomN; i++){
-      //Serial.println("mouse method");
+      //Serial.println(F("mouse method");
       int randomNN = (int)random(97,122);
       Keyboard.write(randomNN);
       delay(10);
@@ -82,7 +82,7 @@ void trashData(int type){
   else if(type == 1){//types gibberish into password field then deletes it (very insecure)
     int randomN = (int)random(0,5);
     for(int i = 0; i < randomN; i++){
-      //Serial.println("Doing delete style random trash"); 
+      //Serial.println(F("Doing delete style random trash"); 
       int randomNN = (int)random(97,122);
       Keyboard.write(randomNN);
       delay(5);
@@ -98,7 +98,7 @@ void trashData(int type){
     Keyboard.write(116);
     Keyboard.releaseAll();
     for(int i = 0; i < randomN; i++){
-      //Serial.println("Doing chrome/firefox style random trash"); 
+      //Serial.println(F("Doing chrome/firefox style random trash"); 
       int randomNN = (int)random(97,122);
       Keyboard.write(randomNN);
     }
@@ -146,7 +146,7 @@ void programNewPassword(){
             result += (char)Serial.read();
             delay(5);
           }
-          Serial.print("Set pin to: ");
+          Serial.print(F("Set pin to: "));
           Serial.println(result);
           _addString(result, 90);
           //stringToEEPROM(result, 1000);                                                         //*****************************************************************************************
@@ -235,7 +235,7 @@ void _addString(String stringToAdd, int stringPlace){
   _stringToEEPROM(stringToAdd, earliestEmptyIndex);
   EEPROM.write(stringPlace, earliestEmptyIndex);
   //Serial.print(stringPlace);
-  //Serial.print(",");
+  //Serial.print(F(",");
   //Serial.println(earliestEmptyIndex);
   EEPROM.write(stringPlace+1, earliestEmptyIndex+stringToAdd.length()+1);
 }
@@ -347,3 +347,58 @@ String _getString(int stringNumber){
   }
   return result;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+
+String retrievePasswordFromEEPROM(int addr){
+  String result = "";
+  for(int i = 0; i < EEPROM.read(addr); i++){
+    result+=(char)EEPROM.read(i+addr+1);
+    delay(5);
+  }
+  return result;
+}
+
+
+
+
+
+void stringToEEPROM(String toE, int addr){
+  EEPROM.write(addr, toE.length());
+  for(int i = 0; i < toE.length(); i ++){
+    EEPROM.write(addr+i+1, toE.charAt(i));
+    delay(5);
+  }
+}
+
+*/
+
+
+
